@@ -33,33 +33,27 @@ impl Redisesh {
     pub fn insert(&mut self, session_data: Option<String>) -> Result<SessionToken, Error> {
         let token = Redisesh::generate_token();
         let base64_token = base64::encode(token, base64::Variant::Original);
-        let active = self.is_active(&base64_token)?;
 
-        // XXX: This check is propably not required, because of the
-        //      cryptographically random generated token
-        if !active {
-            // Store token with redis
-            let _: () = redis::cmd("HSETNX")
-                .arg(&base64_token)
-                .arg("session_data")
-                .arg(session_data)
-                .query(&mut self.conn)?;
+        // Store token with redis
+        let _: () = redis::cmd("HSETNX")
+            .arg(&base64_token)
+            .arg("session_data")
+            .arg(session_data)
+            .query(&mut self.conn)?;
 
-            // Check configuration
-            match &self.config {
-                Some(configuration) => {
-                    // Handle expiration
-                    match configuration.expiration {
-                        Some(exp) => self.set_expiration(&base64_token, exp.as_secs())?,
-                        None => (),
-                    }
+        // Check configuration
+        match &self.config {
+            Some(configuration) => {
+                // Handle expiration
+                match configuration.expiration {
+                    Some(exp) => self.set_expiration(&base64_token, exp.as_secs())?,
+                    None => (),
                 }
-                None => (),
             }
-            Ok(base64_token)
-        } else {
-            Err(Error::ActiveSessionError)
+            None => (),
         }
+
+        Ok(base64_token)
     }
     /// Set session expiration
     fn set_expiration(&mut self, base64_token: &str, duration: u64) -> Result<(), Error> {
@@ -203,7 +197,7 @@ mod tests {
 
     #[test]
     fn test_expiration() {
-        let expiration = std::time::Duration::from_secs(1);
+        let expiration = std::time::Duration::from_secs(2);
         let mut redisesh = Redisesh::new("redis://127.0.0.1/").unwrap();
         let session_data = Some(String::from("{username: John}"));
         let base64_token = redisesh.insert(session_data).unwrap();

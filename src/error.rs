@@ -5,7 +5,6 @@ pub enum Error {
     DBConnectionError,
     TokenCreationError,
     RedisResponseError,
-    ActiveSessionError,
 }
 
 impl std::error::Error for Error {}
@@ -16,7 +15,6 @@ impl fmt::Display for Error {
             Error::DBConnectionError => write!(f, "Error establishing connection with Redis"),
             Error::TokenCreationError => write!(f, "Error while generating random token"),
             Error::RedisResponseError => write!(f, "Redis response Error"),
-            Error::ActiveSessionError => write!(f, "Session is already active"),
         }
     }
 }
