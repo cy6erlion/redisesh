@@ -10,7 +10,7 @@ pub type SessionToken = String;
 /// Session Configuration
 pub struct Config {
     /// Expiration for all sessions that will be stored
-    expiration: Option<std::time::Duration>,
+    pub expiration: Option<std::time::Duration>,
 }
 /// Session manager
 pub struct Redisesh {
