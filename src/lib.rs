@@ -152,22 +152,14 @@ mod tests {
         let exists = redisesh.is_active(base64_token).unwrap();
 
         // Token does not exist
-        if exists {
-            assert!(false);
-        } else {
-            assert!(true)
-        }
+        assert_eq!(exists, false);
 
         let session_data = Some(String::from("{username: John}"));
         let base64_token = redisesh.insert(session_data).unwrap();
         let exists = redisesh.is_active(&base64_token).unwrap();
 
         // Token exists because we inserted it
-        if exists {
-            assert!(true);
-        } else {
-            assert!(false)
-        }
+        assert_eq!(exists, true);
     }
 
     #[test]
@@ -178,11 +170,7 @@ mod tests {
         let exists = redisesh.is_active(&base64_token).unwrap();
 
         // Token currently exists because we just inserted it
-        if exists {
-            assert!(true);
-        } else {
-            assert!(false)
-        }
+        assert_eq!(exists, true);
 
         // Remove the token
         redisesh.remove(&base64_token).unwrap();
@@ -190,11 +178,7 @@ mod tests {
         let exists = redisesh.is_active(&base64_token).unwrap();
 
         // Token does not exist because we just removed it
-        if exists {
-            assert!(false);
-        } else {
-            assert!(true);
-        }
+        assert_eq!(exists, false);
     }
 
     #[test]
@@ -218,11 +202,7 @@ mod tests {
 
         // Token still exists because no expiration was set after it
         // was inserted
-        if exists {
-            assert!(true);
-        } else {
-            assert!(false)
-        }
+        assert_eq!(exists, true);
 
         // Set session expiration
         redisesh.configure(Config {
@@ -238,11 +218,7 @@ mod tests {
         let exists = redisesh.is_active(&base64_token).unwrap();
 
         // Token does not exist because expiration was set
-        if exists {
-            assert!(false);
-        } else {
-            assert!(true)
-        }
+        assert_eq!(exists, false);
     }
 
     #[test]
