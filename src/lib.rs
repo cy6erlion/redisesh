@@ -1,5 +1,5 @@
 //! # Redisesh
-//! Redis based session management
+//! Redis based session manager
 mod error;
 use error::Error;
 use sodiumoxide::{base64, randombytes::randombytes};
@@ -58,7 +58,7 @@ impl Redisesh {
     /// Set session expiration
     fn set_expiration(&mut self, base64_token: &str, duration: u64) -> Result<(), Error> {
         let _: () = redis::cmd("EXPIRE")
-            .arg(&base64_token)
+            .arg(base64_token)
             .arg(duration)
             .query(&mut self.conn)?;
         Ok(())
@@ -86,7 +86,7 @@ impl Redisesh {
     }
     /// Generate random token of 64 bytes
     fn generate_token() -> Vec<u8> {
-        randombytes(64)
+        randombytes(16)
     }
 }
 
@@ -192,17 +192,18 @@ mod tests {
     fn test_generate_token() {
         let token1 = Redisesh::generate_token();
         let token2 = Redisesh::generate_token();
+
         assert_ne!(token1, token2);
     }
 
     #[test]
     fn test_expiration() {
-        let expiration = std::time::Duration::from_secs(2);
+        let expiration = std::time::Duration::from_secs(1);
         let mut redisesh = Redisesh::new("redis://127.0.0.1/").unwrap();
         let session_data = Some(String::from("{username: John}"));
         let base64_token = redisesh.insert(session_data).unwrap();
 
-        std::thread::sleep(expiration);
+        std::thread::sleep(std::time::Duration::from_secs(2));
 
         let exists = redisesh.is_active(&base64_token).unwrap();
 
@@ -223,7 +224,7 @@ mod tests {
         let session_data = Some(String::from("{username: Smith}"));
         let base64_token = redisesh.insert(session_data).unwrap();
 
-        std::thread::sleep(expiration);
+        std::thread::sleep(std::time::Duration::from_secs(2));
 
         let exists = redisesh.is_active(&base64_token).unwrap();
 
