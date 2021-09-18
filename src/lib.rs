@@ -1,6 +1,6 @@
 //! # Redisesh
 //! Redis based session manager
-mod error;
+pub mod error;
 use error::Error;
 use sodiumoxide::{base64, randombytes::randombytes};
 
