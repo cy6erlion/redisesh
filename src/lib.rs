@@ -63,6 +63,15 @@ impl Redisesh {
             .query(&mut self.conn)?;
         Ok(())
     }
+    /// Get session by key
+    pub fn get(&mut self, base64_token: &str) -> Result<Option<String>, Error> {
+        let session: Option<String> = redis::cmd("HGET")
+            .arg(base64_token)
+            .arg("session_data")
+            .query(&mut self.conn)?;
+
+        Ok(session)
+    }
     /// Checks if a session is active
     pub fn is_active(&mut self, base64_token: &str) -> Result<bool, Error> {
         let exists: bool = redis::cmd("HEXISTS")
@@ -234,5 +243,19 @@ mod tests {
         } else {
             assert!(true)
         }
+    }
+
+    #[test]
+    fn test_get() {
+        let mut redisesh = Redisesh::new("redis://127.0.0.1/").unwrap();
+        let session_data = Some(String::from("{username: John}"));
+        let base64_token = redisesh.insert(session_data).unwrap();
+
+        let retrieved_session_data = redisesh.get(&base64_token).unwrap();
+
+        assert_eq!(
+            retrieved_session_data,
+            Some(String::from("{username: John}"))
+        );
     }
 }
