@@ -1,6 +1,7 @@
 [package]
 name = "redisesh"
 authors = ["Jackson G. Kaindume <seestem@merely.tech>"]
+description = "Redis based session manager"
 version = "0.1.0"
 edition = "2018"
 license = "MIT"
