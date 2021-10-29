@@ -1,3 +1,5 @@
+![crates.io](https://img.shields.io/crates/v/redisesh "crates.io")
+
 ``` text
                    .___.__                     .__
 _______   ____   __| _/|__| ______ ____   _____|  |__
